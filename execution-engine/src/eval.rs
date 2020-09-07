@@ -37,7 +37,7 @@ pub async fn run_string(state: &ExecState, body: Expr) -> String {
 /*   D.list((*start..*end).map(int).collect()) */
 /* } */
 
-fn stdlib<'a, 'b>() -> StdlibDef<'a, 'b> {
+fn stdlib<'a, 'b>() -> StdlibDef<'a> {
   //   #[stdlibfn]
   //   fn int__toString__0(a: Int) {
   //     dstr(&*format!("{}", *a))
@@ -61,15 +61,16 @@ fn stdlib<'a, 'b>() -> StdlibDef<'a, 'b> {
   //
   fn int__random64__0<'x, 'y>(
     )
-      -> (FunctionDesc_, StdlibFunction<'x, 'y>)
+      -> (FunctionDesc_, StdlibFunction<'x>)
   {
     let fn_name = FunctionDesc_::FunctionDesc("dark".to_string(),
                                               "stdlib".to_string(),
                                               "Int".to_string(),
                                               "random64".to_string(),
                                               0);
-    let f: FuncSig<'_, 'y> =
-      Box::new(|state: &'y ExecState, args: Vec<Dval>| {
+    let f: FuncSig<'x> =
+      Box::new(|state: &ExecState, args: Vec<Dval>| {
+        let caller = state.caller;
         async move {
       {
       match args.iter().map(|v| &(**v)).collect::<Vec<_>>().as_slice()
@@ -87,7 +88,7 @@ fn stdlib<'a, 'b>() -> StdlibDef<'a, 'b> {
               return arg.clone()
             }
           }
-          Arc::new(Dval_::DSpecial(Special::Error(state.caller, IncorrectArguments(fn_name, args))))
+          Arc::new(Dval_::DSpecial(Special::Error(caller, IncorrectArguments(fn_name, args))))
         }
       }
     }

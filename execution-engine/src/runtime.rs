@@ -36,11 +36,11 @@ impl Caller {
 }
 
 // Two lifetimes: the execstate has to live as long as the boxed fn
-pub type FuncSig<'a, 'b> = Box<dyn Fn(&'b crate::eval::ExecState,
-                                    Vec<Dval>)
-                                    -> BoxFuture<'a, Dval>
-                                 + Send
-                                 + Sync>;
+pub type FuncSig<'a> = Box<dyn Fn(&crate::eval::ExecState,
+                                Vec<Dval>)
+                                -> BoxFuture<'a, Dval>
+                             + Send
+                             + Sync>;
 
 pub type SymTable = im::HashMap<String, Dval>;
 
@@ -62,21 +62,21 @@ pub fn gtlid() -> TLID {
   TLID::TLID(rand::random())
 }
 
-pub struct StdlibFunction<'a, 'b> {
-  pub f: FuncSig<'a, 'b>,
+pub struct StdlibFunction<'a> {
+  pub f: FuncSig<'a>,
 }
 
-impl fmt::Debug for StdlibFunction<'_, '_> {
+impl fmt::Debug for StdlibFunction<'_> {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     f.write_str("function")
   }
 }
 
-pub type StdlibDef<'a, 'b> =
-  std::collections::HashMap<FunctionDesc_, StdlibFunction<'a, 'b>>;
+pub type StdlibDef<'a> =
+  std::collections::HashMap<FunctionDesc_, StdlibFunction<'a>>;
 
-pub struct Environment<'a, 'b> {
-  pub functions: StdlibDef<'a, 'b>,
+pub struct Environment<'a> {
+  pub functions: StdlibDef<'a>,
 }
 
-unsafe impl Send for Environment<'_, '_> {}
+unsafe impl Send for Environment<'_> {}
